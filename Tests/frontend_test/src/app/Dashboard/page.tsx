@@ -1,6 +1,7 @@
 "use client"
 import axios from "axios";
 import { useState, useEffect } from "react";
+import styles from './styles.module.css'
 
 interface Character {
     id?: string;
@@ -78,7 +79,23 @@ interface Character {
   
     return (
       <div>
-          <table>
+        <form onSubmit={handleSubmit} className={styles.elementsContainer}>
+            <label>
+                Name:
+                <input type="text" value={name} onChange={e => setName(e.target.value)} required />
+            </label>
+            <label>
+                Class:
+                <input type="text" value={classType} onChange={e => setClassType(e.target.value)} required />
+            </label>
+            <label>
+                Spec:
+                <input type="text" value={spec} onChange={e => setSpec(e.target.value)} required />
+            </label>
+            <input type="submit" value="Create" />
+        </form>
+
+          <table className={styles.elementsContainer}>
             <thead>
               <tr>
                 <th>Name</th>
@@ -90,30 +107,14 @@ interface Character {
             <tbody>
               {data?.map((item, index) => (
                 <tr key={index}>
-                  <td>{item.name}</td>
-                  <td>{item.class}</td>
-                  <td>{item.spec}</td>
-                  <td>{item.dateOfCreation}</td>
+                  <td className={styles.tableElements}>{item.name}</td>
+                  <td className={styles.tableElements}>{item.class}</td>
+                  <td className={styles.tableElements}>{item.spec}</td>
+                  <td className={styles.tableElements}>{item.dateOfCreation}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-
-          <form onSubmit={handleSubmit}>
-        <label>
-          Name:
-          <input type="text" value={name} onChange={e => setName(e.target.value)} required />
-        </label>
-        <label>
-          Class:
-          <input type="text" value={classType} onChange={e => setClassType(e.target.value)} required />
-        </label>
-        <label>
-          Spec:
-          <input type="text" value={spec} onChange={e => setSpec(e.target.value)} required />
-        </label>
-        <input type="submit" value="Create" />
-      </form>
       </div>
     );
   }
