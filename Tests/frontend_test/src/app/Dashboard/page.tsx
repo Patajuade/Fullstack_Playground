@@ -2,6 +2,7 @@
 import axios from "axios";
 import { useState, useEffect, ChangeEvent } from "react";
 import styles from "./styles.module.css";
+import Chart from "../components/Chart/Chart.component";
 
 interface Character {
   id?: string;
@@ -232,6 +233,7 @@ function Page() {
           })}
         </tbody>
       </table>
+      <Chart/>
     </div>
   );
 }
