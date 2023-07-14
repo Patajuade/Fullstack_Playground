@@ -6,3 +6,12 @@
     padding-right: 2rem;
     padding-top: 0.5rem;
 }
+
+.buttonsContainer{
+    display: flex;
+    justify-content: space-between;
+}
+
+.buttonsContainer button{
+    margin-right: 0.5rem;
+}

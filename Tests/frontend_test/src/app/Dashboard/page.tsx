@@ -116,8 +116,6 @@ function Page() {
     setSpec(character.spec);
   };
   
-  
-
 
   return (
     <div>
@@ -173,9 +171,12 @@ function Page() {
               <td className={styles.tableElements}>{item.class}</td>
               <td className={styles.tableElements}>{item.spec}</td>
               <td className={styles.tableElements}>{item.dateOfCreation}</td>
-              <td>
-                <button onClick={() => handleEdit(item)}>Edit</button>
-                <button onClick={() => deleteCharacter(item)}>Delete</button>
+              <td >
+                <div className={styles.buttonsContainer} >
+                  <div><button onClick={() => handleEdit(item)}>Edit</button></div>
+                  <div><button onClick={() => deleteCharacter(item)}>Delete</button></div>
+                </div>
+                
               </td>
             </tr>
           ))}
