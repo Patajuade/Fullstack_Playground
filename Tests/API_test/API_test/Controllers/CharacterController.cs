@@ -45,7 +45,7 @@ namespace API_test.Controllers
             character.Name = updatedCharacter.Name;
             character.Class = updatedCharacter.Class;
             character.DateOfCreation = updatedCharacter.DateOfCreation;
-            character.Spec = updatedCharacter.Spec;
+            character.Role = updatedCharacter.Role;
 
             await _context.SaveChangesAsync();
             return Ok(character);

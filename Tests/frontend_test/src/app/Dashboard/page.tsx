@@ -6,22 +6,44 @@ import styles from "./styles.module.css";
 interface Character {
   id?: string;
   name: string;
-  class: string;
+  class: number;
   dateOfCreation: string;
-  spec: string;
+  role: number;
+}
+
+enum CharacterClass {
+  Warrior,
+  Mage,
+  Priest,
+  Druid,
+  Monk,
+  Evoker,
+  Rogue,
+  Shaman,
+  Paladin,
+  DK,
+  DH,
+  Hunter,
+}
+enum CharacterRole {
+  Tank,
+  Healer,
+  DPS,
+  Support,
 }
 
 function Page() {
   const [data, setData] = useState<Character[] | null>(null);
 
-  const [name, setName] = useState("");
-  const [classType, setClassType] = useState("");
-  const [dateOfCreation, setDateOfCreation] = useState(
-    new Date().toISOString()
+  const [name, setName] = useState<Character["name"]>("");
+  const [classType, setClassType] = useState<Character["class"]>(0);
+  const [dateOfCreation, setDateOfCreation] = useState<
+    Character["dateOfCreation"]
+  >(new Date().toISOString());
+  const [role, setRole] = useState<Character["role"]>(0);
+  const [editingCharacter, setEditingCharacter] = useState<Character | null>(
+    null
   );
-  const [spec, setSpec] = useState("");
-  const [editingCharacter, setEditingCharacter] = useState<Character | null>(null);
-  
 
   const loadData = async () => {
     try {
@@ -45,7 +67,6 @@ function Page() {
     }
   };
 
-  
   const updateCharacter = async (updatedCharacter: Character) => {
     try {
       await axios.put(
@@ -67,44 +88,43 @@ function Page() {
     }
   };
 
-  const handleChange = (e:ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    console.log(name, value);
-    switch(name) {
+    switch (name) {
       case "name":
         setName(value);
         break;
       case "class":
-        setClassType(value);
+        setClassType(Number(value));
         break;
-      case "spec":
-        setSpec(value);
+      case "role":
+        setRole(Number(value));
         break;
       default:
         break;
     }
-  }
+  };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-  
+
     const character = {
       name: name,
       class: classType,
       dateOfCreation: dateOfCreation,
-      spec: spec,
+      role: role,
     };
-  
+
     if (editingCharacter) {
       updateCharacter({ ...character, id: editingCharacter.id });
       setEditingCharacter(null); // reset after updating
     } else {
       createCharacter(character);
     }
-  
-    setName('');
-    setClassType('');
-    setSpec('');
+
+    setName("");
+    setClassType(0);
+    setRole(0);
     setDateOfCreation(new Date().toISOString());
   };
 
@@ -113,9 +133,8 @@ function Page() {
     setName(character.name);
     setClassType(character.class);
     setDateOfCreation(character.dateOfCreation);
-    setSpec(character.spec);
+    setRole(character.role);
   };
-  
 
   return (
     <div>
@@ -133,23 +152,44 @@ function Page() {
         </label>
         <label>
           Class:
-          <input
-            type="text"
+          <select
             value={classType}
             name="class"
             onChange={handleChange}
             required
-          />
+          >
+            {Object.values(CharacterClass)
+              .filter((key) => !isNaN(Number(key)))
+              .map((key) => (
+                <option
+                  key={`${CharacterClass[Number(key)]}_${key}`}
+                  value={key}
+                >
+                  {CharacterClass[Number(key)]}
+                </option>
+              ))}
+          </select>
         </label>
+
         <label>
-          Spec:
-          <input
-            type="text"
-            name="spec"
-            value={spec}
-            onChange={handleChange}
+          Role:
+          <select
+            value={role}
+            name="role"
+            onChange={(e) => setRole(Number(e.target.value))}
             required
-          />
+          >
+            {Object.values(CharacterRole)
+              .filter((key) => !isNaN(Number(key)))
+              .map((key) => (
+                <option
+                  key={`${CharacterRole[Number(key)]}_${key}`}
+                  value={key}
+                >
+                  {CharacterRole[Number(key)]}
+                </option>
+              ))}
+          </select>
         </label>
         <input type="submit" value={editingCharacter ? "Edit" : "Create"} />
       </form>
@@ -160,26 +200,36 @@ function Page() {
           <tr>
             <th>Name</th>
             <th>Class</th>
-            <th>Spec</th>
+            <th>Role</th>
             <th>Date of Creation</th>
           </tr>
         </thead>
         <tbody>
-          {data?.map((item, index) => (
-            <tr key={index}>
-              <td className={styles.tableElements}>{item.name}</td>
-              <td className={styles.tableElements}>{item.class}</td>
-              <td className={styles.tableElements}>{item.spec}</td>
-              <td className={styles.tableElements}>{item.dateOfCreation}</td>
-              <td >
-                <div className={styles.buttonsContainer} >
-                  <div><button onClick={() => handleEdit(item)}>Edit</button></div>
-                  <div><button onClick={() => deleteCharacter(item)}>Delete</button></div>
-                </div>
-                
-              </td>
-            </tr>
-          ))}
+          {data?.map((item) => {
+            const { name, class: classType, dateOfCreation, role, id } = item;
+            return (
+              <tr key={`${name}_${classType}_${id}`}>
+                <td className={styles.tableElements}>{name}</td>
+                <td className={styles.tableElements}>
+                  {CharacterClass[classType]}
+                </td>
+                <td className={styles.tableElements}>{CharacterRole[role]}</td>
+                <td className={styles.tableElements}>{dateOfCreation}</td>
+                <td>
+                  <div className={styles.buttonsContainer}>
+                    <div>
+                      <button onClick={() => handleEdit(item)}>Edit</button>
+                    </div>
+                    <div>
+                      <button onClick={() => deleteCharacter(item)}>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

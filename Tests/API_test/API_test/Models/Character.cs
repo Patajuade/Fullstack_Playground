@@ -9,8 +9,33 @@ namespace API_test.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public string Class { get; set; }
+        public CharacterClass Class { get; set; }
         public DateTime DateOfCreation { get; set; }
-        public string Spec { get; set; }
+        public CharacterRole Role { get; set; }
     }
+
+    public enum CharacterClass
+    {
+        Warrior,
+        Mage,
+        Priest,
+        Druid,
+        Monk,
+        Evoker,
+        Rogue,
+        Shaman,
+        Paladin,
+        DK,
+        DH,
+        Hunter
+    }
+
+    public enum CharacterRole
+    {
+        Tank,
+        Healer,
+        DPS,
+        Support
+    }
+
 }
