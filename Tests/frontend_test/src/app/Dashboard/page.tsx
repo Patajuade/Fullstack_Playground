@@ -20,6 +20,8 @@ function Page() {
     new Date().toISOString()
   );
   const [spec, setSpec] = useState("");
+  const [editingCharacter, setEditingCharacter] = useState<Character | null>(null);
+  
 
   const loadData = async () => {
     try {
@@ -43,24 +45,7 @@ function Page() {
     }
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-
-    const newCharacter = {
-      name: name,
-      class: classType,
-      dateOfCreation: dateOfCreation,
-      spec: spec,
-    };
-
-    createCharacter(newCharacter);
-
-    // Réinitialiser les champs du formulaire
-    setName("");
-    setClassType("");
-    setSpec("");
-  };
-
+  
   const updateCharacter = async (updatedCharacter: Character) => {
     try {
       await axios.put(
@@ -73,9 +58,9 @@ function Page() {
     }
   };
 
-  const deleteCharacter = async (id: string) => {
+  const deleteCharacter = async (character: Character) => {
     try {
-      await axios.delete(`https://localhost:7178/Character/${id}`);
+      await axios.delete(`https://localhost:7178/Character/${character.id}`);
       loadData(); // recharger les données après une mise à jour
     } catch (error) {
       console.error(error);
@@ -100,8 +85,43 @@ function Page() {
     }
   }
 
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+  
+    const character = {
+      name: name,
+      class: classType,
+      dateOfCreation: dateOfCreation,
+      spec: spec,
+    };
+  
+    if (editingCharacter) {
+      updateCharacter({ ...character, id: editingCharacter.id });
+      setEditingCharacter(null); // reset after updating
+    } else {
+      createCharacter(character);
+    }
+  
+    setName('');
+    setClassType('');
+    setSpec('');
+    setDateOfCreation(new Date().toISOString());
+  };
+
+  const handleEdit = (character: Character) => {
+    setEditingCharacter(character);
+    setName(character.name);
+    setClassType(character.class);
+    setDateOfCreation(character.dateOfCreation);
+    setSpec(character.spec);
+  };
+  
+  
+
+
   return (
     <div>
+      {/* TODO : faire un composant */}
       <form onSubmit={handleSubmit} className={styles.elementsContainer}>
         <label>
           Name:
@@ -133,8 +153,10 @@ function Page() {
             required
           />
         </label>
-        <input type="submit" value="Create" />
+        <input type="submit" value={editingCharacter ? "Edit" : "Create"} />
       </form>
+
+      {/* TODO : faire un composant */}
       <table className={styles.elementsContainer}>
         <thead>
           <tr>
@@ -151,6 +173,10 @@ function Page() {
               <td className={styles.tableElements}>{item.class}</td>
               <td className={styles.tableElements}>{item.spec}</td>
               <td className={styles.tableElements}>{item.dateOfCreation}</td>
+              <td>
+                <button onClick={() => handleEdit(item)}>Edit</button>
+                <button onClick={() => deleteCharacter(item)}>Delete</button>
+              </td>
             </tr>
           ))}
         </tbody>

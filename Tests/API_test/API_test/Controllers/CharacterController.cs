@@ -34,7 +34,7 @@ namespace API_test.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCharacter(long id, [FromBody] Character updatedCharacter)
+        public async Task<IActionResult> UpdateCharacter(Guid id, [FromBody] Character updatedCharacter)
         {
             var character = await _context.Character.FindAsync(id);
             if (character == null)
@@ -52,7 +52,7 @@ namespace API_test.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCharacter(long id)
+        public async Task<IActionResult> DeleteCharacter(Guid id)
         {
             var character = await _context.Character.FindAsync(id);
             if (character == null)
