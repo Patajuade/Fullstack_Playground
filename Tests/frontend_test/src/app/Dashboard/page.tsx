@@ -1,6 +1,6 @@
 "use client";
 import axios from "axios";
-import { useState, useEffect, ChangeEvent, Suspense } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import styles from "./styles.module.css";
 import Chart from "../components/Chart/Chart.component";
 import { log } from "console";
@@ -36,7 +36,6 @@ enum CharacterRole {
 
 function Page() {
   const [data, setData] = useState<Character[] | null>(null);
-
   const [name, setName] = useState<Character["name"]>("");
   const [classType, setClassType] = useState<Character["class"]>(-1);
   const [dateOfCreation, setDateOfCreation] = useState<
