@@ -49,7 +49,7 @@ const Chart = ({
   };
   return (
     <div>
-      <Bar data={data} options={options} />
+      <Bar data={data} options={options}/>
     </div>
   );
 };

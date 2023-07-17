@@ -1,8 +1,9 @@
 "use client";
 import axios from "axios";
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent, Suspense } from "react";
 import styles from "./styles.module.css";
 import Chart from "../components/Chart/Chart.component";
+import { log } from "console";
 
 interface Character {
   id?: string;
@@ -142,9 +143,12 @@ function Page() {
   const characterClassList = Object.values(CharacterClass).filter(
     (key) => !isNaN(Number(key))
   );
+  // 0 -> 11
 
-  const characterRoleList = Object.values(CharacterRole)
-    .filter((key) => !isNaN(Number(key)));
+  const characterRoleList = Object.values(CharacterRole).filter(
+    (key) => !isNaN(Number(key))
+  );
+  // 0 -> 3
 
   return (
     <div>
@@ -192,7 +196,10 @@ function Page() {
           >
             <option value={-1}>Select a role</option>
             {characterRoleList.map((characterRoleIndex) => (
-              <option key={CharacterRole[Number(characterRoleIndex)]} value={characterRoleIndex}>
+              <option
+                key={CharacterRole[Number(characterRoleIndex)]}
+                value={characterRoleIndex}
+              >
                 {CharacterRole[Number(characterRoleIndex)]}
               </option>
             ))}
@@ -243,35 +250,36 @@ function Page() {
           })}
         </tbody>
       </table>
-      <div className="chartContainer">
-      <Chart
-        chartData={characterClassList.map((characterClassIndex) => {
-          return {
-            data:
-              data?.filter((character) => {
-                return character.class === characterClassIndex;
-              }).length ?? 0,
-            label: CharacterClass[Number(characterClassIndex)],
-            title: "Class",
-            datasetName: "Characters per class",
-          };
-        })}
-      />
-      <Chart
-        chartData={characterRoleList.map((characterRoleIndex) => {
-          return {
-            data:
-              data?.filter((character) => {
-                return character.class === characterRoleIndex;
-              }).length ?? 0,
-            label: CharacterRole[Number(characterRoleIndex)],
-            title: "Role", 
-            datasetName: "Characters per role",
-          };
-        })}
-      />
+      <div className={styles.chartContainer}>
+        <Chart
+          chartData={characterClassList.map((characterClassIndex) => {
+            return {
+              data:
+                data?.filter((character) => {
+                  return character.class === characterClassIndex;
+                }).length ?? 0,
+              // Ici, data = un tableau de personnages. On filtre ce tableau pour ne garder que les personnages dont la classe est la même que l'index de la classe actuelle. 
+              // Ensuite, il compte combien de personnages correspondent à cette condition avec .length. Si data est null ou undefined (ce qui est vérifié par l'opérateur ?.), on retourne 0.
+              label: CharacterClass[Number(characterClassIndex)],
+              title: "Class",
+              datasetName: "Characters per class",
+            };
+          })}
+        />
+        <Chart
+          chartData={characterRoleList.map((characterRoleIndex) => {
+            return {
+              data:
+                data?.filter((character) => {
+                  return character.role === characterRoleIndex;
+                }).length ?? 0,
+              label: CharacterRole[Number(characterRoleIndex)],
+              title: "Role",
+              datasetName: "Characters per role",
+            };
+          })}
+        />
       </div>
-      
     </div>
   );
 }
