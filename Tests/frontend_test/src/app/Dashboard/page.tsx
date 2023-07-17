@@ -13,7 +13,6 @@ interface Character {
 }
 
 enum CharacterClass {
-  Select = 0,
   Warrior,
   Mage,
   Priest,
@@ -28,7 +27,6 @@ enum CharacterClass {
   Hunter,
 }
 enum CharacterRole {
-  Select = 0,
   Tank,
   Healer,
   DPS,
@@ -39,11 +37,11 @@ function Page() {
   const [data, setData] = useState<Character[] | null>(null);
 
   const [name, setName] = useState<Character["name"]>("");
-  const [classType, setClassType] = useState<Character["class"]>(0);
+  const [classType, setClassType] = useState<Character["class"]>(-1);
   const [dateOfCreation, setDateOfCreation] = useState<
     Character["dateOfCreation"]
   >(new Date().toISOString());
-  const [role, setRole] = useState<Character["role"]>(0);
+  const [role, setRole] = useState<Character["role"]>(-1);
   const [editingCharacter, setEditingCharacter] = useState<Character | null>(
     null
   );
@@ -91,7 +89,9 @@ function Page() {
     }
   };
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     switch (name) {
       case "name":
@@ -126,8 +126,8 @@ function Page() {
     }
 
     setName("");
-    setClassType(0);
-    setRole(0);
+    setClassType(-1);
+    setRole(-1);
     setDateOfCreation(new Date().toISOString());
   };
 
@@ -138,6 +138,13 @@ function Page() {
     setDateOfCreation(character.dateOfCreation);
     setRole(character.role);
   };
+
+  const characterClassList = Object.values(CharacterClass).filter(
+    (key) => !isNaN(Number(key))
+  );
+
+  const characterRoleList = Object.values(CharacterRole)
+    .filter((key) => !isNaN(Number(key)));
 
   return (
     <div>
@@ -161,16 +168,17 @@ function Page() {
             onChange={handleChange}
             required
           >
-            {Object.values(CharacterClass)
-              .filter((key) => !isNaN(Number(key)))
-              .map((key) => (
-                <option
-                  key={`${CharacterClass[Number(key)]}_${key}`}
-                  value={key}
-                >
-                  {CharacterClass[Number(key)] === 'Select' ? 'Select a class' : CharacterClass[Number(key)]}
-                </option>
-              ))}
+            <option value={-1}>Select a class</option>
+            {characterClassList.map((characterClassList) => (
+              <option
+                key={`${
+                  CharacterClass[Number(characterClassList)]
+                }_${characterClassList}`}
+                value={characterClassList}
+              >
+                {CharacterClass[Number(characterClassList)]}
+              </option>
+            ))}
           </select>
         </label>
 
@@ -182,19 +190,19 @@ function Page() {
             onChange={(e) => setRole(Number(e.target.value))}
             required
           >
-            {Object.values(CharacterRole)
-              .filter((key) => !isNaN(Number(key)))
-              .map((key) => (
-                <option
-                  key={`${CharacterRole[Number(key)]}_${key}`}
-                  value={key}
-                >
-                  {CharacterClass[Number(key)] === 'Select' ? 'Select a role' : CharacterClass[Number(key)]}
-                </option>
-              ))}
+            <option value={-1}>Select a role</option>
+            {characterRoleList.map((characterRoleIndex) => (
+              <option key={CharacterRole[Number(characterRoleIndex)]} value={characterRoleIndex}>
+                {CharacterRole[Number(characterRoleIndex)]}
+              </option>
+            ))}
           </select>
         </label>
-        <input type="submit" value={editingCharacter ? "Edit" : "Create"} disabled={classType === 0 || role === 0 || name === ""} />
+        <input
+          type="submit"
+          value={editingCharacter ? "Edit" : "Create"}
+          disabled={classType === -1 || role === -1 || name === ""}
+        />
       </form>
 
       {/* TODO : faire un composant */}
@@ -235,7 +243,17 @@ function Page() {
           })}
         </tbody>
       </table>
-      <Chart/>
+      <Chart
+        chartData={characterClassList.map((characterClassIndex) => {
+          return {
+            data:
+              data?.filter((character) => {
+                return character.class === characterClassIndex;
+              }).length ?? 0,
+            label: CharacterClass[Number(characterClassIndex)],
+          };
+        })}
+      />
     </div>
   );
 }
