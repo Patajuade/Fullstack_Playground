@@ -13,6 +13,7 @@ interface Character {
 }
 
 enum CharacterClass {
+  Select = 0,
   Warrior,
   Mage,
   Priest,
@@ -27,6 +28,7 @@ enum CharacterClass {
   Hunter,
 }
 enum CharacterRole {
+  Select = 0,
   Tank,
   Healer,
   DPS,
@@ -166,7 +168,7 @@ function Page() {
                   key={`${CharacterClass[Number(key)]}_${key}`}
                   value={key}
                 >
-                  {CharacterClass[Number(key)]}
+                  {CharacterClass[Number(key)] === 'Select' ? 'Select a class' : CharacterClass[Number(key)]}
                 </option>
               ))}
           </select>
@@ -187,12 +189,12 @@ function Page() {
                   key={`${CharacterRole[Number(key)]}_${key}`}
                   value={key}
                 >
-                  {CharacterRole[Number(key)]}
+                  {CharacterClass[Number(key)] === 'Select' ? 'Select a role' : CharacterClass[Number(key)]}
                 </option>
               ))}
           </select>
         </label>
-        <input type="submit" value={editingCharacter ? "Edit" : "Create"} />
+        <input type="submit" value={editingCharacter ? "Edit" : "Create"} disabled={classType === 0 || role === 0 || name === ""} />
       </form>
 
       {/* TODO : faire un composant */}
