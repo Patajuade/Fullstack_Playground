@@ -23,13 +23,13 @@ ChartJS.register(
 const Chart = ({
   chartData,
 }: {
-  chartData: { label: string; data: number }[];
+  chartData: { label: string; data: number, title: string, datasetName: string }[];
 }) => {
   const data = {
     labels: chartData.map((data) => data.label),
     datasets: [
       {
-        label: "Dataset 1",
+        label: chartData[0].datasetName,
         data: chartData.map((data) => data.data),
         backgroundColor: "rgba(255, 99, 132, 0.5)",
       },
@@ -43,7 +43,7 @@ const Chart = ({
       },
       title: {
         display: true,
-        text: "Chart.js Bar Chart",
+        text: chartData[0].title,
       },
     },
   };

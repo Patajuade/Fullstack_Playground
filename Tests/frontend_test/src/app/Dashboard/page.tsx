@@ -243,6 +243,7 @@ function Page() {
           })}
         </tbody>
       </table>
+      <div className="chartContainer">
       <Chart
         chartData={characterClassList.map((characterClassIndex) => {
           return {
@@ -251,9 +252,26 @@ function Page() {
                 return character.class === characterClassIndex;
               }).length ?? 0,
             label: CharacterClass[Number(characterClassIndex)],
+            title: "Class",
+            datasetName: "Characters per class",
           };
         })}
       />
+      <Chart
+        chartData={characterRoleList.map((characterRoleIndex) => {
+          return {
+            data:
+              data?.filter((character) => {
+                return character.class === characterRoleIndex;
+              }).length ?? 0,
+            label: CharacterRole[Number(characterRoleIndex)],
+            title: "Role", 
+            datasetName: "Characters per role",
+          };
+        })}
+      />
+      </div>
+      
     </div>
   );
 }
