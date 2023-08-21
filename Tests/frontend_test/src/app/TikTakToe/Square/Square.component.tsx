@@ -1,21 +1,13 @@
-"use client";
-
-import { useState } from "react";
 import styles from "./styles.module.css";
 
 interface ISquareProps {
   value: string;
+  onSquareClick: () => void;
 }
 
-function Square() {
-  const [value, setValue] = useState<string>("");
-
-  function clickHandler() {
-    setValue("X");
-  }
-
+function Square({ value, onSquareClick }: ISquareProps) {
   return (
-    <button className={styles.square} onClick={clickHandler}>
+    <button className={styles.square} onClick={onSquareClick}>
       {value}
     </button>
   );
