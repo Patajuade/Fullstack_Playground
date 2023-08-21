@@ -4,6 +4,7 @@ import { useState, useEffect, ChangeEvent } from "react";
 import styles from "./styles.module.css";
 import Chart from "../components/Chart/Chart.component";
 import { log } from "console";
+import useFetch from "../hooks/useFetch";
 
 interface Character {
   id?: string;
@@ -257,7 +258,7 @@ function Page() {
                 data?.filter((character) => {
                   return character.class === characterClassIndex;
                 }).length ?? 0,
-              // Ici, data = un tableau de personnages. On filtre ce tableau pour ne garder que les personnages dont la classe est la même que l'index de la classe actuelle. 
+              // Ici, data = un tableau de personnages. On filtre ce tableau pour ne garder que les personnages dont la classe est la même que l'index de la classe actuelle.
               // Ensuite, il compte combien de personnages correspondent à cette condition avec .length. Si data est null ou undefined (ce qui est vérifié par l'opérateur ?.), on retourne 0.
               label: CharacterClass[Number(characterClassIndex)],
               title: "Class",
