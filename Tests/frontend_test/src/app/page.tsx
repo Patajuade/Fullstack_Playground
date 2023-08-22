@@ -8,8 +8,8 @@ export default function Home() {
       <Link href="/Dashboard">
         <button type="button">Dashboard</button>
       </Link>
-      <Link href="/TikTakToe">
-        <button type="button">TikTakToe</button>
+      <Link href="/TicTacToe">
+        <button type="button">TicTacToe</button>
       </Link>
     </main>
   );

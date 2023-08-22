@@ -4,12 +4,16 @@ import { useState } from "react";
 import Square from "../Square/Square.component";
 import styles from "./styles.module.css";
 
-export default function Board() {
+interface IBoardProps {
+  xIsNext: boolean;
+  squares: string[];
+  onPlay: (nextSquares: string[]) => void;
+}
+
+export default function Board({ xIsNext, squares, onPlay }: IBoardProps) {
   //To collect data from multiple children, or to have two child components communicate with each other, declare the shared state in their parent component instead.
   //The parent component can pass that state back down to the children via props. This keeps the child components in sync with each other and with their parent.
 
-  const [squares, setSquares] = useState(Array(9).fill(null));
-  const [xIsNext, setXIsNext] = useState(true); //This will be used to determine who is the next player
   const winner = calculateWinner(squares);
   let status;
   if (winner) {
@@ -31,8 +35,7 @@ export default function Board() {
       nextSquares[i] = "O";
     }
 
-    setSquares(nextSquares);
-    setXIsNext(!xIsNext);
+    onPlay(nextSquares);
     console.log(squares);
   }
 
