@@ -3,8 +3,7 @@ import axios from "axios";
 import { useState, useEffect, ChangeEvent } from "react";
 import styles from "./styles.module.css";
 import Chart from "../components/Chart/Chart.component";
-import { log } from "console";
-import useFetch from "../hooks/useFetch";
+import { useForm } from "react-hook-form";
 
 interface Character {
   id?: string;
@@ -47,6 +46,36 @@ function Page() {
     null
   );
 
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<Character>();
+
+  // Mettre à jour les valeurs lorsqu'on modifie le personnage
+  useEffect(() => {
+    if (editingCharacter) {
+      setValue("name", editingCharacter.name);
+      setValue("class", editingCharacter.class);
+      setValue("dateOfCreation", editingCharacter.dateOfCreation);
+      setValue("role", editingCharacter.role);
+    }
+  }, [editingCharacter, setValue]);
+
+  const onSubmit = (formData: Character) => {
+    if (editingCharacter) {
+      updateCharacter({ ...formData, id: editingCharacter.id });
+      setEditingCharacter(null); // reset after updating
+    } else {
+      createCharacter(formData);
+    }
+
+    // You can reset form values here if needed
+    // reset();
+  };
+
   const loadData = async () => {
     try {
       const response = await axios.get("https://localhost:7178/Character");
@@ -62,7 +91,19 @@ function Page() {
 
   const createCharacter = async (newCharacter: Character) => {
     try {
-      await axios.post("https://localhost:7178/Character", newCharacter);
+      console.log("Submitting form with data:", {
+        Id: "ee15487d-b3ff-42e0-98fc-8d0799256e9b",
+        Name: newCharacter.name,
+        Class: newCharacter.class,
+        Role: newCharacter.role,
+        DateOfCreation: new Date().toISOString(),
+      });
+      await axios.post("https://localhost:7178/Character", {
+        Name: newCharacter.name,
+        Class: Number(newCharacter.class),
+        Role: Number(newCharacter.role),
+        DateOfCreation: new Date().toISOString(),
+      });
       loadData(); // recharger les données après une mise à jour
     } catch (error) {
       console.error(error);
@@ -109,29 +150,6 @@ function Page() {
     }
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-
-    const character = {
-      name: name,
-      class: classType,
-      dateOfCreation: dateOfCreation,
-      role: role,
-    };
-
-    if (editingCharacter) {
-      updateCharacter({ ...character, id: editingCharacter.id });
-      setEditingCharacter(null); // reset after updating
-    } else {
-      createCharacter(character);
-    }
-
-    setName("");
-    setClassType(-1);
-    setRole(-1);
-    setDateOfCreation(new Date().toISOString());
-  };
-
   const handleEdit = (character: Character) => {
     setEditingCharacter(character);
     setName(character.name);
@@ -153,47 +171,40 @@ function Page() {
   return (
     <div>
       {/* TODO : faire un composant */}
-      <form onSubmit={handleSubmit} className={styles.elementsContainer}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className={styles.elementsContainer}
+      >
         <label>
           Name:
           <input
             type="text"
-            value={name}
-            name="name"
-            onChange={handleChange}
-            required
+            {...register("name", { required: "This field is required" })}
           />
+          {errors.name && <p>{errors.name.message}</p>}
         </label>
+
         <label>
           Class:
           <select
-            value={classType}
-            name="class"
-            onChange={handleChange}
-            required
+            {...register("class", { required: "This field is required" })}
           >
             <option value={-1}>Select a class</option>
             {characterClassList.map((characterClassList) => (
               <option
-                key={`${
-                  CharacterClass[Number(characterClassList)]
-                }_${characterClassList}`}
+                key={CharacterClass[Number(characterClassList)]}
                 value={characterClassList}
               >
                 {CharacterClass[Number(characterClassList)]}
               </option>
             ))}
           </select>
+          {errors.class && <p>{errors.class.message}</p>}
         </label>
 
         <label>
           Role:
-          <select
-            value={role}
-            name="role"
-            onChange={(e) => setRole(Number(e.target.value))}
-            required
-          >
+          <select {...register("role", { required: "This field is required" })}>
             <option value={-1}>Select a role</option>
             {characterRoleList.map((characterRoleIndex) => (
               <option
@@ -204,12 +215,10 @@ function Page() {
               </option>
             ))}
           </select>
+          {errors.role && <p>{errors.role.message}</p>}
         </label>
-        <input
-          type="submit"
-          value={editingCharacter ? "Edit" : "Create"}
-          disabled={classType === -1 || role === -1 || name === ""}
-        />
+
+        <input type="submit" value={editingCharacter ? "Edit" : "Create"} />
       </form>
 
       {/* TODO : faire un composant */}
