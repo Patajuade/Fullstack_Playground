@@ -36,7 +36,6 @@ export default function Board({ xIsNext, squares, onPlay }: IBoardProps) {
     }
 
     onPlay(nextSquares);
-    console.log(squares);
   }
 
   function calculateWinner(squares: string[]) {

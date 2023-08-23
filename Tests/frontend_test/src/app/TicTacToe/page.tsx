@@ -2,7 +2,58 @@
 
 import Link from "next/link";
 import Board from "./Board/Board.component";
-import { useState } from "react";
+import { useReducer, useState } from "react";
+
+enum ReducerActions {
+  SET_NEXT_PLAYER,
+  SET_HISTORY,
+  SET_CURRENT_MOVE,
+  SET_PLAY,
+  SET_JUMP_TO,
+}
+
+interface IGameState {
+  isNext: boolean;
+  history: string[][];
+  currentMove: number;
+}
+
+type TReducerAction =
+  | {
+      type: ReducerActions.SET_PLAY;
+      payload: string[];
+    }
+  | {
+      type: ReducerActions.SET_JUMP_TO;
+      payload: number;
+    };
+
+const initialGameState: IGameState = {
+  isNext: true,
+  history: [Array(9).fill("")],
+  currentMove: 0,
+};
+
+function reducer(state: IGameState, action: TReducerAction) {
+  switch (action.type) {
+    case ReducerActions.SET_JUMP_TO:
+      return {
+        isNext: action.payload % 2 === 0,
+        history: state.history.slice(0, action.payload + 1),
+        currentMove: action.payload,
+      };
+    case ReducerActions.SET_PLAY:
+      return {
+        isNext: !state.isNext,
+        history: [...state.history, action.payload],
+        currentMove:
+          [...state.history.slice(0, state.currentMove + 1), action.payload]
+            .length - 1,
+      };
+    default:
+      return state;
+  }
+}
 
 const Moves = ({
   history,
@@ -23,24 +74,24 @@ const Moves = ({
 );
 
 function Game() {
-  const [isNext, setXIsNext] = useState(true);
-  const [history, setHistory] = useState([Array(9).fill(null)]);
-  const [currentMove, setCurrentMove] = useState(0);
+  const [{ isNext, currentMove, history }, gameStateUpdate] = useReducer(
+    reducer,
+    initialGameState
+  );
   const currentSquares = history[currentMove];
 
   function handlePlay(nextSquares: string[]) {
-    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
-    setHistory(nextHistory);
-    setCurrentMove(nextHistory.length - 1);
-
-    setHistory([...history, nextSquares]); //spread syntax : enumerate all the elements of the history array
-    setXIsNext(!isNext);
+    gameStateUpdate({
+      type: ReducerActions.SET_PLAY,
+      payload: nextSquares,
+    });
   }
 
   function jumpTo(nextMove: number) {
-    setCurrentMove(nextMove);
-    setXIsNext(nextMove % 2 === 0);
-    setHistory(history.slice(0, nextMove + 1));
+    gameStateUpdate({
+      type: ReducerActions.SET_JUMP_TO,
+      payload: nextMove,
+    });
   }
 
   return (
