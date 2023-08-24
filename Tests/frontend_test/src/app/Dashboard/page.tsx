@@ -35,16 +35,13 @@ enum CharacterRole {
 }
 
 function Page() {
-  const [data, setData] = useState<Character[] | null>(null);
-  const [name, setName] = useState<Character["name"]>("");
-  const [classType, setClassType] = useState<Character["class"]>(-1);
-  const [dateOfCreation, setDateOfCreation] = useState<
-    Character["dateOfCreation"]
-  >(new Date().toISOString());
-  const [role, setRole] = useState<Character["role"]>(-1);
-  const [editingCharacter, setEditingCharacter] = useState<Character | null>(
-    null
-  );
+  const [data, setData] = useState<Character[]>([]);
+  const [editingCharacterIndex, setEditingCharacterIndex] = useState<
+    number | null
+  >(null);
+  const editingCharacterData = editingCharacterIndex
+    ? data[editingCharacterIndex]
+    : null;
 
   const {
     register,
@@ -56,18 +53,18 @@ function Page() {
 
   // Mettre à jour les valeurs lorsqu'on modifie le personnage
   useEffect(() => {
-    if (editingCharacter) {
-      setValue("name", editingCharacter.name);
-      setValue("class", editingCharacter.class);
-      setValue("dateOfCreation", editingCharacter.dateOfCreation);
-      setValue("role", editingCharacter.role);
+    if (editingCharacterData) {
+      setValue("name", editingCharacterData.name);
+      setValue("class", editingCharacterData.class);
+      setValue("dateOfCreation", editingCharacterData.dateOfCreation);
+      setValue("role", editingCharacterData.role);
     }
-  }, [editingCharacter, setValue]);
+  }, [editingCharacterIndex, setValue]);
 
   const onSubmit = (formData: Character) => {
-    if (editingCharacter) {
-      updateCharacter({ ...formData, id: editingCharacter.id });
-      setEditingCharacter(null); // reset after updating
+    if (editingCharacterData) {
+      updateCharacter({ ...formData, id: editingCharacterData.id });
+      // reset after updating
     } else {
       createCharacter(formData);
     }
@@ -91,20 +88,14 @@ function Page() {
 
   const createCharacter = async (newCharacter: Character) => {
     try {
-      console.log("Submitting form with data:", {
-        Id: "ee15487d-b3ff-42e0-98fc-8d0799256e9b",
-        Name: newCharacter.name,
-        Class: newCharacter.class,
-        Role: newCharacter.role,
-        DateOfCreation: new Date().toISOString(),
-      });
       await axios.post("https://localhost:7178/Character", {
         Name: newCharacter.name,
         Class: Number(newCharacter.class),
         Role: Number(newCharacter.role),
         DateOfCreation: new Date().toISOString(),
       });
-      loadData(); // recharger les données après une mise à jour
+      setData((oldDate) => [...oldDate, newCharacter]);
+      //loadData(); // recharger les données après une mise à jour
     } catch (error) {
       console.error(error);
     }
@@ -116,7 +107,13 @@ function Page() {
         `https://localhost:7178/Character/${updatedCharacter.id}`,
         updatedCharacter
       );
-      loadData(); // recharger les données après une mise à jour
+      setData((oldDate) =>
+        oldDate.map((character) =>
+          character.id ? character : updatedCharacter
+        )
+      );
+      setEditingCharacterIndex(null);
+      //loadData(); // recharger les données après une mise à jour
     } catch (error) {
       console.error(error);
     }
@@ -125,37 +122,15 @@ function Page() {
   const deleteCharacter = async (character: Character) => {
     try {
       await axios.delete(`https://localhost:7178/Character/${character.id}`);
-      loadData(); // recharger les données après une mise à jour
+      setData((oldDate) => oldDate.filter((c) => c.id !== character.id));
+      //loadData(); // recharger les données après une mise à jour
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    switch (name) {
-      case "name":
-        setName(value);
-        break;
-      case "class":
-        setClassType(Number(value));
-        break;
-      case "role":
-        setRole(Number(value));
-        break;
-      default:
-        break;
-    }
-  };
-
-  const handleEdit = (character: Character) => {
-    setEditingCharacter(character);
-    setName(character.name);
-    setClassType(character.class);
-    setDateOfCreation(character.dateOfCreation);
-    setRole(character.role);
+  const handleEdit = (characterIndex: number) => {
+    setEditingCharacterIndex(characterIndex);
   };
 
   const characterClassList = Object.values(CharacterClass).filter(
@@ -218,7 +193,10 @@ function Page() {
           {errors.role && <p>{errors.role.message}</p>}
         </label>
 
-        <input type="submit" value={editingCharacter ? "Edit" : "Create"} />
+        <input
+          type="submit"
+          value={editingCharacterIndex ? "Edit" : "Create"}
+        />
       </form>
 
       {/* TODO : faire un composant */}
@@ -232,7 +210,7 @@ function Page() {
           </tr>
         </thead>
         <tbody>
-          {data?.map((item) => {
+          {data?.map((item, index) => {
             const { name, class: classType, dateOfCreation, role, id } = item;
             return (
               <tr key={`${name}_${classType}_${id}`}>
@@ -245,7 +223,7 @@ function Page() {
                 <td>
                   <div className={styles.buttonsContainer}>
                     <div>
-                      <button onClick={() => handleEdit(item)}>Edit</button>
+                      <button onClick={() => handleEdit(index)}>Edit</button>
                     </div>
                     <div>
                       <button onClick={() => deleteCharacter(item)}>
