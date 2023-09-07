@@ -74,7 +74,7 @@ function Page() {
 
   const loadData = async () => {
     try {
-      const response = await axios.get("https://localhost:7178/Character");
+      const response = await axios.get("http://localhost:5225/Character");
       setData(response.data);
     } catch (error) {
       console.error(error);
@@ -87,7 +87,7 @@ function Page() {
 
   const createCharacter = async (newCharacter: Character) => {
     try {
-      await axios.post("https://localhost:7178/Character", {
+      await axios.post("http://localhost:5225/Character", {
         Name: newCharacter.name,
         Class: Number(newCharacter.class),
         Role: Number(newCharacter.role),
@@ -103,7 +103,7 @@ function Page() {
   const updateCharacter = async (updatedCharacter: Character) => {
     try {
       await axios.put(
-        `https://localhost:7178/Character/${updatedCharacter.id}`,
+        `http://localhost:5225/Character/${updatedCharacter.id}`,
         updatedCharacter
       );
       setData((oldDate) =>
@@ -120,7 +120,7 @@ function Page() {
 
   const deleteCharacter = async (character: Character) => {
     try {
-      await axios.delete(`https://localhost:7178/Character/${character.id}`);
+      await axios.delete(`http://localhost:5225/Character/${character.id}`);
       setData((oldDate) => oldDate.filter((c) => c.id !== character.id));
       //loadData(); // recharger les données après une mise à jour
     } catch (error) {
