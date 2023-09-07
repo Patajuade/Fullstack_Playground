@@ -46,7 +46,6 @@ function Page() {
   const {
     register,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors },
   } = useForm<Character>();

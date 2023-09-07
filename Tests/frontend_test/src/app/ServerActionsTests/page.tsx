@@ -1,20 +1,8 @@
-export default function create() {
-  const createCharacter = async (formData: FormData) => {
-    "use server";
+import { FormComponent } from "./testHOC/FormComponent";
+import createHOC from "./testHOC/FormCreateChar";
 
-    const name = formData.get("name");
-    const email = formData.get("email");
-    const password = formData.get("password");
+const CreateCharacterForm = createHOC(FormComponent);
 
-    console.log({ name, email, password });
-  };
-
-  return (
-    <form action={createCharacter} method="POST">
-      <input type="text" name="name" />
-      <select name="class" />
-      <select name="role" />
-      <button type="submit">Create Account</button>
-    </form>
-  );
+export default async function Create() {
+  return <CreateCharacterForm />;
 }
