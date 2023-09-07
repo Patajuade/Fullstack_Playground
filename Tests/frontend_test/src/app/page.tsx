@@ -11,6 +11,9 @@ export default function Home() {
       <Link href="/TicTacToe">
         <button type="button">TicTacToe</button>
       </Link>
+      <Link href="/ServerActionsTests">
+        <button type="button">ServerActions Tests</button>
+      </Link>
     </main>
   );
 }
