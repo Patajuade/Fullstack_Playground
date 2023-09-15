@@ -14,6 +14,9 @@ export default function Home() {
       <Link href="/ServerActionsTests">
         <button type="button">ServerActions Tests</button>
       </Link>
+      <Link href="/3D">
+        <button type="button">3D</button>
+      </Link>
     </main>
   );
 }
