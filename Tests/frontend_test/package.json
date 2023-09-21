@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@faker-js/faker": "^8.0.2",
-    "@react-three/drei": "^9.83.9",
+    "@react-three/drei": "^9.84.2",
     "@react-three/fiber": "^8.14.1",
     "@types/node": "20.4.1",
     "@types/react": "18.2.14",
