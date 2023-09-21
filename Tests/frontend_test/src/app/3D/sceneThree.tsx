@@ -39,30 +39,19 @@ export const Human3D = () => {
 
   const handleMouseWheel = (e) => {
     const zoomSpeed = 0.001;
-    const minZoom = 0.5; // Limite minimale de zoom
-    const maxZoom = 2.0; // Limite maximale de zoom
 
     // Obtenir la position du pointeur par rapport au modèle
     const pointerPosition = e.point.clone();
 
     // Effectuer le zoom en fonction de la position du pointeur
     const zoomFactor = 1 + e.deltaY * zoomSpeed;
+    groupRef.current.scale.multiplyScalar(zoomFactor);
 
-    // Ajuster l'échelle du modèle tout en maintenant les limites
-    const newScale = groupRef.current.scale.clone().multiplyScalar(zoomFactor);
-    if (newScale.x >= minZoom && newScale.x <= maxZoom) {
-      groupRef.current.scale.copy(newScale);
-    }
-
-    // Ajuster la position du modèle pour maintenir le centre fixe
-    const currentModelPosition = groupRef.current.position.clone();
+    // Ajuster la position du modèle pour maintenir le pointeur au même endroit
     const newModelPosition = pointerPosition
       .clone()
-      .sub(currentModelPosition)
-      .multiplyScalar(zoomFactor);
-    groupRef.current.position.copy(
-      pointerPosition.clone().sub(newModelPosition)
-    );
+      .multiplyScalar(1 - zoomFactor);
+    groupRef.current.position.add(newModelPosition);
   };
 
   useEffect(() => {
@@ -96,6 +85,7 @@ export const SceneThree = () => {
     <Canvas>
       <Light />
       <Human3D />
+      <OrbitControls />
     </Canvas>
   );
 };
