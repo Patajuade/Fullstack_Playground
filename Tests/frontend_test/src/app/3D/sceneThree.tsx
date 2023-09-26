@@ -85,7 +85,23 @@ export const SceneThree = () => {
     <Canvas>
       <Light />
       <Human3D />
-      <OrbitControls />
+      {/* <OrbitControls /> */}
     </Canvas>
   );
 };
+
+// plusieurs façons de faire :
+// 1
+// On peut utiliser orbitControls pour gérer le zoom et la rotation
+// Avantage : zoom et rotation fonctionnent très bien
+// Désavantage : la lumière reste collée à une face cu modèle
+// Solution : éclairer tout le modèle
+// 2
+// On peut utiliser les fonctions de rotation et de zoom de la souris
+// Avantage : la lumière éclaire comme il faut, a le comportement d'un "soleil"
+// Désavantage : la rotation est un peu saccadée, ne fonctionne plus quand on sort du mesh, le modèle se fait la malle avec le zoom
+// Solution : mieux faire la rotation, le zoom,...
+// 3
+// On pourrait faire la rotation avec des sliders, un à l'horizontale, un à la verticale, et le zoom à la molette ou slider
+// Avantage : ce serait probablement moins capricieux
+// Désavantage : ce serait moins intuitif, moins "fun"
