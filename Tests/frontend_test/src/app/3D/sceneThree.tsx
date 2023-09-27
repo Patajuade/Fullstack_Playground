@@ -1,20 +1,25 @@
 "use client";
-import { OrbitControls } from "@react-three/drei";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { Suspense, useEffect, useRef, useState } from "react";
+import {
+  GroupProps,
+  extend,
+  useFrame,
+  useLoader,
+  useThree,
+} from "@react-three/fiber";
+import { useEffect, useRef, useState } from "react";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { log } from "console";
 
-export const Light = () => {
-  return (
-    <>
-      <directionalLight intensity={1} position={[0, 0, 10]} />
-    </>
-  );
+extend({ OrbitControls });
+
+export const Light = ({ lightRef }) => {
+  return <></>;
 };
 
 export const Human3D = () => {
   const obj = useLoader(OBJLoader, "/assets/3D/human_base_meshes_bundle.obj");
-  const groupRef = useRef();
+  const groupRef = useRef<GroupProps>();
   const [isDragging, setIsDragging] = useState(false);
   const previousMousePosition = useRef([0, 0]);
 
@@ -23,23 +28,24 @@ export const Human3D = () => {
     previousMousePosition.current = [e.clientX, e.clientY];
   };
 
-  const handleMouseMove = (e) => {
-    if (isDragging) {
-      const [deltaX, deltaY] = [
-        e.clientX - previousMousePosition.current[0],
-        e.clientY - previousMousePosition.current[1],
-      ];
+  // const handleMouseMove = (e) => {
+  //   if (isDragging) {
+  //     const [deltaX, deltaY] = [
+  //       e.clientX - previousMousePosition.current[0],
+  //       e.clientY - previousMousePosition.current[1],
+  //     ];
 
-      groupRef.current.rotation.y += deltaX / 100;
-      groupRef.current.rotation.x += deltaY / 100;
+  //     groupRef.current.rotation.y += deltaX / 100;
+  //     groupRef.current.rotation.x += deltaY / 100;
 
-      previousMousePosition.current = [e.clientX, e.clientY];
-    }
-  };
+  //     previousMousePosition.current = [e.clientX, e.clientY];
+  //   }
+  // };
 
   const handleMouseWheel = (e) => {
-    const zoomSpeed = 0.001;
+    if (!groupRef.current) return;
 
+    const zoomSpeed = 0.001;
     // Obtenir la position du pointeur par rapport au modèle
     const pointerPosition = e.point.clone();
 
@@ -70,7 +76,6 @@ export const Human3D = () => {
     <group
       ref={groupRef}
       onPointerDown={handleMouseClickAndDrag}
-      onPointerMove={handleMouseMove}
       onWheel={handleMouseWheel}
     >
       <mesh position={[0, -2.5, 0]}>
@@ -81,12 +86,29 @@ export const Human3D = () => {
 };
 
 export const SceneThree = () => {
+  const humanRef = useRef();
+  const lightRef = useRef();
+  const { camera, gl } = useThree();
+  console.log(camera);
+  console.log(gl);
+
+  useFrame((state, delta) => {
+    //delta est le temps écoulé depuis la dernière frame
+    //on utilise delta pour faire tourner le modèle à la même vitesse sur tous les ordinateurs
+    //humanRef.current.rotation.y += delta;
+    if (lightRef.current) {
+      lightRef.current.position.copy(camera.position);
+    }
+  });
+
   return (
-    <Canvas>
-      <Light />
-      <Human3D />
-      {/* <OrbitControls /> */}
-    </Canvas>
+    <>
+      <orbitControls args={[camera, gl.domElement]} />
+      <directionalLight ref={lightRef} intensity={1} position={[0, 0, 10]} />
+      <mesh ref={humanRef}>
+        <Human3D />
+      </mesh>
+    </>
   );
 };
 
@@ -101,7 +123,3 @@ export const SceneThree = () => {
 // Avantage : la lumière éclaire comme il faut, a le comportement d'un "soleil"
 // Désavantage : la rotation est un peu saccadée, ne fonctionne plus quand on sort du mesh, le modèle se fait la malle avec le zoom
 // Solution : mieux faire la rotation, le zoom,...
-// 3
-// On pourrait faire la rotation avec des sliders, un à l'horizontale, un à la verticale, et le zoom à la molette ou slider
-// Avantage : ce serait probablement moins capricieux
-// Désavantage : ce serait moins intuitif, moins "fun"

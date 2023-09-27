@@ -1,5 +1,7 @@
+"use client";
 import { useEffect, useState } from "react";
 import { SceneThree } from "./sceneThree";
+import { Canvas } from "@react-three/fiber";
 
 export default async function Page() {
   return (
@@ -10,7 +12,9 @@ export default async function Page() {
           width: "100vw",
         }}
       >
-        <SceneThree />
+        <Canvas>
+          <SceneThree />
+        </Canvas>
       </div>
     </div>
   );
