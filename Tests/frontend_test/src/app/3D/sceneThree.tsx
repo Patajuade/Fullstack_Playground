@@ -1,4 +1,5 @@
 "use client";
+import { Html, OrbitControls } from "@react-three/drei";
 import {
   GroupProps,
   extend,
@@ -6,19 +7,33 @@ import {
   useLoader,
   useThree,
 } from "@react-three/fiber";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-
-extend({ OrbitControls });
+import { Intersection } from "three/src/core/Raycaster";
 
 export const Human3D = () => {
   const obj = useLoader(OBJLoader, "/assets/3D/human_base_meshes_bundle.obj");
   const groupRef = useRef<GroupProps>();
+
   return (
     <group ref={groupRef}>
       <mesh position={[0, -2.5, 0]}>
-        <primitive object={obj} scale={3} />
+        <primitive
+          object={obj}
+          scale={3}
+          onClick={(event) => {
+            // console.log(event.intersections);
+            // console.log(event.intersections[0].object.name);
+            const intersections: Intersection[] = event.intersections;
+            const element = intersections[0].object;
+            console.log(element.material.color.getHexString());
+            if (element.material.color.getHexString() === "ff0000") {
+              element.material.color.set("#ffffff");
+              return;
+            }
+            element.material.color.set("#ff0000");
+          }}
+        />
       </mesh>
     </group>
   );
@@ -27,9 +42,24 @@ export const Human3D = () => {
 export const SceneThree = () => {
   const humanRef = useRef();
   const lightRef = useRef();
+  const orbitControlsRef = useRef();
   const { camera, gl } = useThree();
-  console.log(camera);
-  console.log(gl);
+
+  const resetCamera = (event: KeyboardEvent) => {
+    if (event.key === "r") {
+      camera.position.set(0, 0, 5);
+      orbitControlsRef.current.thetaDelta = 0;
+      orbitControlsRef.current.phiDelta = 0;
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", resetCamera);
+
+    () => {
+      document.removeEventListener("keydown", resetCamera);
+    };
+  });
 
   useFrame((state, delta) => {
     //delta est le temps écoulé depuis la dernière frame
@@ -42,8 +72,9 @@ export const SceneThree = () => {
 
   return (
     <>
-      <orbitControls args={[camera, gl.domElement]} />
+      <OrbitControls makeDefault ref={orbitControlsRef} />
       <directionalLight ref={lightRef} intensity={1} position={[0, 0, 10]} />
+      <ambientLight intensity={0.1} />
       <mesh ref={humanRef}>
         <Human3D />
       </mesh>
