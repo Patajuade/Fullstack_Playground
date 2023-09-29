@@ -8,8 +8,8 @@ export default async function Page() {
     <div id="canvas-container">
       <div
         style={{
-          height: "100vh",
-          width: "100vw",
+          height: "50vh",
+          width: "50vw",
         }}
       >
         <Canvas>

@@ -21,9 +21,7 @@ export const Human3D = () => {
         <primitive
           object={obj}
           scale={3}
-          onClick={(event) => {
-            // console.log(event.intersections);
-            // console.log(event.intersections[0].object.name);
+          onClick={(event: any) => {
             const intersections: Intersection[] = event.intersections;
             const element = intersections[0].object;
             console.log(element.material.color.getHexString());
@@ -55,16 +53,9 @@ export const SceneThree = () => {
 
   useEffect(() => {
     document.addEventListener("keydown", resetCamera);
-
-    () => {
-      document.removeEventListener("keydown", resetCamera);
-    };
   });
 
-  useFrame((state, delta) => {
-    //delta est le temps écoulé depuis la dernière frame
-    //on utilise delta pour faire tourner le modèle à la même vitesse sur tous les ordinateurs
-    //humanRef.current.rotation.y += delta;
+  useFrame(() => {
     if (lightRef.current) {
       lightRef.current.position.copy(camera.position);
     }
