@@ -1,12 +1,6 @@
 "use client";
-import { Html, OrbitControls } from "@react-three/drei";
-import {
-  GroupProps,
-  extend,
-  useFrame,
-  useLoader,
-  useThree,
-} from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import { GroupProps, useFrame, useLoader, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { Intersection } from "three/src/core/Raycaster";
@@ -19,6 +13,10 @@ interface Human3DProps {
 
 interface AddHealthProblemProps {
   bodyPart: string;
+}
+
+interface SceneThreeProps {
+  setBodyPart: (bodyPart: string) => void;
 }
 
 export const Human3D = ({ setBodyPart }: Human3DProps) => {
@@ -56,19 +54,18 @@ export const Human3D = ({ setBodyPart }: Human3DProps) => {
 
 export const AddHealthProblem = ({ bodyPart }: AddHealthProblemProps) => {
   return (
-    <Html>
+    <>
       <input />
       <div>{bodyPart}</div>
-    </Html>
+    </>
   );
 };
 
-export const SceneThree = () => {
+export const SceneThree = ({ setBodyPart }: SceneThreeProps) => {
   const humanRef = useRef();
   const lightRef = useRef();
   const orbitControlsRef = useRef();
   const { camera, gl } = useThree();
-  const [bodyPart, setBodyPart] = useState<string>("");
 
   const resetCamera = (event: KeyboardEvent) => {
     if (event.key === "r") {
@@ -95,7 +92,6 @@ export const SceneThree = () => {
       <ambientLight intensity={0.1} />
       <mesh ref={humanRef}>
         <Human3D setBodyPart={setBodyPart} />
-        <AddHealthProblem bodyPart={bodyPart} />
       </mesh>
     </>
   );
