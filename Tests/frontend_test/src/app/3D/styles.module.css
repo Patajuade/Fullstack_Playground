@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+}
+
+.canvasContainer {
+  height: 50vh;
+  width: 50vw;
+}
+
+.infoContainer {
+  background-color: whitesmoke;
+  color: black;
+  height: 50vh;
+  width: 50vw;
+}

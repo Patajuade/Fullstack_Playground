@@ -1,21 +1,24 @@
 "use client";
 import { useEffect, useState } from "react";
-import { SceneThree } from "./sceneThree";
+import { AddHealthProblem, SceneThree } from "./sceneThree";
 import { Canvas } from "@react-three/fiber";
+import styles from "./styles.module.css";
 
-export default async function Page() {
+export default function Page() {
+  // const [bodyPart, setBodyPart] = useState<string>("");
+
   return (
-    <div id="canvas-container">
-      <div
-        style={{
-          height: "50vh",
-          width: "50vw",
-        }}
-      >
-        <Canvas>
-          <SceneThree />
-        </Canvas>
+    <>
+      <div className={styles.container}>
+        <div className={styles.canvasContainer}>
+          <Canvas>
+            <SceneThree />
+          </Canvas>
+        </div>
+        <div className={styles.infoContainer}>
+          {/* <AddHealthProblem bodyPart={bodyPart} /> */}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
