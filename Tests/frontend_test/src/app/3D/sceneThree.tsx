@@ -8,15 +8,51 @@ import { useHuman3D } from "./human3DContext";
 
 //TODO : Faire en sorte que lorsque l'on clique sur une partie du corps, on puisse recliquer dessus pour ajouter un point coloré pour localiser le problème de santé
 
-export const Human3D = () => {
+interface Human3DProps {
+  setBodyPart: (bodyPart: string) => void;
+}
+
+interface AddHealthProblemProps {
+  bodyPart: string;
+}
+
+interface SceneThreeProps {
+  setBodyPart: (bodyPart: string) => void;
+}
+
+export const Human3D = ({ setBodyPart }: Human3DProps) => {
   const { addBodyPart } = useHuman3D();
   const obj = useLoader(OBJLoader, "/assets/3D/human_base_meshes_bundle.obj");
   const groupRef = useRef<GroupProps>();
+  const [selectedBodyParts, setSelectedBodyParts] = useState<string[]>([]);
 
   const handleClick = (event: any) => {
     const intersections: Intersection[] = event.intersections;
     const element = intersections[0].object;
     const clickedPart = event.intersections[0].object.name;
+    setBodyPart(event.intersections[0].object.name);
+
+    // Si la partie du corps est déjà sélectionnée, on la déselectionne
+    if (selectedBodyParts.includes(clickedPart)) {
+      setSelectedBodyParts((prevSelectedParts) =>
+        prevSelectedParts.filter((part) => part !== clickedPart)
+      );
+      setBodyPart("");
+      // Sinon, on ajoute la partie du corps au tableau des parties sélectionnées
+    } else {
+      setSelectedBodyParts((prevSelectedParts) => [
+        ...prevSelectedParts,
+        clickedPart,
+      ]);
+      setBodyPart(clickedPart);
+    }
+
+    if (element.material.color.getHexString() === "ff0000") {
+      element.material.color.set("#ffffff");
+      return;
+    }
+    element.material.color.set("#ff0000");
+    console.log(selectedBodyParts);
 
     const faceClicked = intersections[0].face!.a;
 
@@ -72,7 +108,7 @@ export const AddHealthProblem = () => {
   );
 };
 
-export const SceneThree = () => {
+export const SceneThree = ({ setBodyPart }: SceneThreeProps) => {
   const humanRef = useRef();
   const lightRef = useRef();
   const orbitControlsRef = useRef();
@@ -107,7 +143,7 @@ export const SceneThree = () => {
       <directionalLight ref={lightRef} intensity={1} position={[0, 0, 10]} />
       <ambientLight intensity={0.1} />
       <mesh ref={humanRef}>
-        <Human3D />
+        <Human3D setBodyPart={setBodyPart} />
       </mesh>
     </>
   );
